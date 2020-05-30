@@ -34,7 +34,7 @@ public interface IdFactory<T> {
    * @return IdFactory
    */
   static IdFactory<Long> defaultFactory() {
-    return DefaultIdFactory.instance();
+    return SnowflakeIdFactory.create(new IpWorkerIdAssigner().assignWorkerId());
   }
 
   /**
@@ -43,8 +43,8 @@ public interface IdFactory<T> {
    * @param serverId 服务器ID
    * @return IdFactory
    */
-  static IdFactory<Long> simpleSnowflake(int serverId) {
-    return SimpleSnowflakeIdFactory.create(serverId);
+  static IdFactory<Long> snowflake(int serverId) {
+    return SnowflakeIdFactory.create(serverId);
   }
 
   /**
@@ -54,23 +54,6 @@ public interface IdFactory<T> {
    */
   static IdFactory<String> boundaryflake() {
     return BoundaryFlakeIdFactory.instance();
-  }
-
-  /**
-   * 循环直到下一个毫秒
-   *
-   * @param lastTime 原毫秒数
-   */
-  default long tilNextMillis(long lastTime) {
-    long timestamp = currentTime();
-    while (timestamp <= lastTime) {
-      timestamp = currentTime();
-    }
-    return timestamp;
-  }
-
-  default long currentTime() {
-    return System.currentTimeMillis();
   }
 
 }

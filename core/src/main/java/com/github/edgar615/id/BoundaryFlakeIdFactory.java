@@ -14,7 +14,6 @@
 
 package com.github.edgar615.id;
 
-import com.github.edgar615.util.net.NetUtils;
 import java.math.BigInteger;
 
 /**
@@ -26,7 +25,7 @@ import java.math.BigInteger;
  * @author Edgar  Date 2016/6/21
  */
 public class BoundaryFlakeIdFactory implements IdFactory<String>, TimeExtracter<String>,
-    ShardingExtracter<String>, SeqExtracter<String> {
+        ShardingExtracter<String>, SeqExtracter<String> {
 
   /**
    * 自增序列的位数
@@ -61,7 +60,7 @@ public class BoundaryFlakeIdFactory implements IdFactory<String>, TimeExtracter<
   /**
    * 将mac地址作为节点ID
    */
-  private static final long SERVER_ID = Long.parseLong(NetUtils.getMac(), 16);
+  private static final long SERVER_ID = Long.parseLong(Utils.getMac(), 16);
 
   /**
    * 单例对象
@@ -83,7 +82,7 @@ public class BoundaryFlakeIdFactory implements IdFactory<String>, TimeExtracter<
 
   @Override
   public synchronized String nextId() {
-    long time = currentTime();
+    long time = Utils.currentTime();
     if (time < lastTime) {
       //当前时间小于上次时间，说明时钟不对
       throw new IllegalStateException("Clock moved backwards.");
@@ -92,7 +91,7 @@ public class BoundaryFlakeIdFactory implements IdFactory<String>, TimeExtracter<
       seqId = (seqId + 1) & SEQ_MASK;
       if (seqId == 0) {
         //说明该毫秒下对序列已经自增完毕，等待下一个毫秒
-        tilNextMillis(lastTime);
+        Utils.tilNextMillis(lastTime);
       }
     } else {
       seqId = INIT_SEQ;

@@ -14,7 +14,8 @@
 
 package com.github.edgar615.id;
 
-import static com.github.edgar615.util.reflect.ReflectUtils.LOGGER;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -38,9 +39,9 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author Edgar
  */
-class SimpleSnowflakeIdFactory implements IdFactory<Long>, TimeExtracter<Long>, SeqExtracter<Long>,
+class SnowflakeIdFactory implements IdFactory<Long>, TimeExtracter<Long>, SeqExtracter<Long>,
     ShardingExtracter<Long> {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeIdFactory.class);
   /**
    * 自增序列的位数
    */
@@ -80,7 +81,7 @@ class SimpleSnowflakeIdFactory implements IdFactory<Long>, TimeExtracter<Long>, 
   /**
    * 用来保存每个服务节点的ID生成类，保证每个节点只有一个实例.
    */
-  private static final ConcurrentMap<Integer, SimpleSnowflakeIdFactory> FACTORY_HOLDER =
+  private static final ConcurrentMap<Integer, SnowflakeIdFactory> FACTORY_HOLDER =
       new ConcurrentHashMap<>();
 
   /**
@@ -98,20 +99,20 @@ class SimpleSnowflakeIdFactory implements IdFactory<Long>, TimeExtracter<Long>, 
    */
   private volatile long seqId = INIT_SEQ;
 
-  private SimpleSnowflakeIdFactory(int serverId) {
+  private SnowflakeIdFactory(int serverId) {
     this.serverId = serverId & SERVER_MASK;
   }
 
   @Override
   public synchronized Long nextId() {
-    long time = currentTime();
+    long time = Utils.currentTime();
     if (time < lastTime) {
       //当前时间小于上次时间，说明时钟不对
       long offset = lastTime - time;
       if (offset <= 5) {
         try {
           wait(offset << 1);
-          time = currentTime();
+          time = Utils.currentTime();
           if (time < lastTime) {
             throw new IllegalStateException("Clock moved backwards.");
           }
@@ -127,7 +128,7 @@ class SimpleSnowflakeIdFactory implements IdFactory<Long>, TimeExtracter<Long>, 
       seqId = (seqId + 1) & SEQ_MASK;
       if (seqId == 0) {
         //说明该毫秒下对序列已经自增完毕，等待下一个毫秒
-        tilNextMillis(lastTime);
+        Utils.tilNextMillis(lastTime);
       }
     } else {
       seqId = INIT_SEQ;
@@ -147,12 +148,12 @@ class SimpleSnowflakeIdFactory implements IdFactory<Long>, TimeExtracter<Long>, 
    * @param serverId 服务器id
    * @return IdFactory
    */
-  static SimpleSnowflakeIdFactory create(int serverId) {
-    SimpleSnowflakeIdFactory idFactory = FACTORY_HOLDER.get(serverId);
+  static SnowflakeIdFactory create(int serverId) {
+    SnowflakeIdFactory idFactory = FACTORY_HOLDER.get(serverId);
     if (idFactory != null) {
       return idFactory;
     }
-    idFactory = FACTORY_HOLDER.putIfAbsent(serverId, new SimpleSnowflakeIdFactory(serverId));
+    idFactory = FACTORY_HOLDER.putIfAbsent(serverId, new SnowflakeIdFactory(serverId));
     if (idFactory != null) {
       return idFactory;
     } else {

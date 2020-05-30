@@ -29,10 +29,6 @@ public class DefaultIdFactoryTest {
 
   @Test
   public void testFactorySingleton() throws InterruptedException {
-    System.out.println(System.currentTimeMillis() << 22);
-    System.out.println(System.currentTimeMillis() << 23);
-    System.out.println(-1 ^ (-1 << 12));
-    System.out.println(23 & 4194303);
     ExecutorService executorService = Executors.newCachedThreadPool();
     Set<IdFactory> idFactories = new CopyOnWriteArraySet<>();
     int count = 100;

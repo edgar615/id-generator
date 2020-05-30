@@ -14,7 +14,6 @@
 
 package com.github.edgar615.id;
 
-import com.github.edgar615.util.net.NetUtils;
 import com.google.common.base.Joiner;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -57,7 +56,7 @@ public class BoundaryflakeIdFactoryTest {
 
   @Test
   public void fetchTime() {
-    System.out.println(Long.parseLong(NetUtils.getMac(), 16));
+    System.out.println(Long.parseLong(Utils.getMac(), 16));
     IdFactory<String> idFactory = IdFactory.boundaryflake();
     String id = "27055360264773117879689960947719";// idFactory.nextId();
     TimeExtracter timeExtracter = (TimeExtracter) idFactory;
