@@ -5,11 +5,14 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.github.edgar615</groupId>
-  <artifactId>id-generator</artifactId>
+  <artifactId>eid</artifactId>
   <packaging>pom</packaging>
   <version>0.0.1</version>
   <modules>
     <module>core</module>
+    <module>db</module>
+    <module>snowflake-zookeeper</module>
+    <module>snowflake-db</module>
   </modules>
 
   <properties>
@@ -22,7 +25,7 @@
     <awaitility.version>2.0.0</awaitility.version>
     <guava.version>26.0-jre</guava.version>
     <util.version>1.1.3.BETA2</util.version>
-    <id.generator.release.version>0.0.1</id.generator.release.version>
+    <eid.release.version>0.0.1</eid.release.version>
   </properties>
 
   <dependencies>

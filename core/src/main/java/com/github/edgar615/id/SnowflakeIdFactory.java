@@ -109,6 +109,7 @@ class SnowflakeIdFactory implements IdFactory<Long>, TimeExtracter<Long>, SeqExt
     if (time < lastTime) {
       //当前时间小于上次时间，说明时钟不对
       long offset = lastTime - time;
+      // 偏差较小，等待
       if (offset <= 5) {
         try {
           wait(offset << 1);
